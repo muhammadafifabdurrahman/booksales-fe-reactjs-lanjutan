@@ -4,6 +4,7 @@ import API from "../../../_api";
 
 export default function AdminAuthors() {
   const [authors, setAuthors] = useState([]);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   const fetchAuthors = async () => {
     try {
@@ -11,6 +12,18 @@ export default function AdminAuthors() {
       setAuthors(res.data.data || []);
     } catch (err) {
       console.error("Gagal ambil data author:", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Yakin mau hapus author ini?")) return;
+    try {
+      await API.delete(`/authors/${id}`);
+      setAuthors(authors.filter((a) => a.id !== id));
+      alert("Author berhasil dihapus!");
+    } catch (err) {
+      console.error("Gagal hapus author:", err);
+      alert("Gagal menghapus author!");
     }
   };
 
@@ -32,14 +45,15 @@ export default function AdminAuthors() {
         </Link>
       </div>
 
-      <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden shadow-md">
+      <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-x-auto shadow-md">
         <table className="w-full border-collapse">
           <thead className="bg-[#334155] text-gray-100">
             <tr>
-              <th className="py-3 px-4 text-left font-medium">#</th>
-              <th className="py-3 px-4 text-left font-medium">Foto</th>
-              <th className="py-3 px-4 text-left font-medium">Nama</th>
+              <th className="py-3 px-4 text-left font-medium">ID</th>
+              <th className="py-3 px-4 text-left font-medium">Photo</th>
+              <th className="py-3 px-4 text-left font-medium">Name</th>
               <th className="py-3 px-4 text-left font-medium">Bio</th>
+              <th className="py-3 px-4 text-left font-medium text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -63,12 +77,41 @@ export default function AdminAuthors() {
                   </td>
                   <td className="py-3 px-4">{a.name}</td>
                   <td className="py-3 px-4">{a.bio}</td>
+                  <td className="py-3 px-4 text-center relative">
+                    {/* Tombol titik tiga */}
+                    <button
+                      onClick={() =>
+                        setOpenMenuId(openMenuId === a.id ? null : a.id)
+                      }
+                      className="p-2 rounded hover:bg-gray-700"
+                    >
+                      ⋮
+                    </button>
+
+                    {/* Menu dropdown */}
+                    {openMenuId === a.id && (
+                      <div className="absolute right-4 mt-2 w-32 bg-[#1e293b] border border-gray-600 rounded-lg shadow-lg z-10">
+                        <Link
+                          to={`/admin/authors/edit/${a.id}`}
+                          className="block px-4 py-2 text-left hover:bg-gray-700"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(a.id)}
+                          className="block w-full text-left px-4 py-2 hover:bg-red-600 hover:text-white rounded-b-lg"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="5"
                   className="text-center py-4 text-gray-400 italic"
                 >
                   Tidak ada data author.
