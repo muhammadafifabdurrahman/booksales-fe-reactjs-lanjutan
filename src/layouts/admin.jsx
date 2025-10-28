@@ -18,16 +18,15 @@ export default function AdminLayout() {
     if (role !== "admin" || !role) {
       navigate("/");
     }
-  }, [token, decodedData, navigate])
+  }, [token, decodedData, navigate]);
 
   const handleLogout = async () => {
     if (token) {
       await logout({ token });
-      localStorage.removeItem("userInfo")
-      
+      localStorage.removeItem("userInfo");
     }
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
   return (
     <>
